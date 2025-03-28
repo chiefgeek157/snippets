@@ -17,25 +17,20 @@ virtualenv_prompt() {
     fi
 }
 
-# Useful when working with git
-git_prompt() {
-    # Check if git is installed
-    command -v git &>/dev/null || return
-
-    # If not in a git repo, print nothing
-    git rev-parse --is-inside-work-tree &>/dev/null || return
-
-    # Print the current branch name
-    local branch_name
-    branch_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-    echo "(${branch_name}) "
-}
-
 # Shorten the path
 #   /home/user1/project/dir/subdir/.hidden/another => ~/p/d/s/.h/another
 shorten_path() {
     pwd | sed -E -e "s:^${HOME}:~:" -e "s:([^/\.])[^/]+/:\1/:g"
 }
+
+# Set useful config for the builtin git prompt
+GIT_PS1_STATESEPARATOR=":"
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWSTASHSTATE=1
+GIT_PS1_SHOWUNTRACKEDFILES=1
+GIT_PS1_SHOWUPSTREAM="auto"
+GIT_PS1_DESCRIBE_STYLE="branch"
+GIT_PS1_SHOWCOLORHINTS=1
 
 # Disable the default virtualenv prompt decorator
 VIRTUAL_ENV_DISABLE_PROMPT=1
@@ -47,10 +42,9 @@ VIRTUAL_ENV_DISABLE_PROMPT=1
 #Since the prompt is long, I wrapped it using line continuation characters
 # NOTE: the second to last line has an embedded newline so does NOT use the
 #       line continuation character ` (backtick)
-PS1="${debian_chroot:+\[$RB\]($debian_chroot)}`
-    `\[$WB\]╭─`
+PS1="\[$WB\]╭─${debian_chroot:+\[$RB\]($debian_chroot)}`
     `\[$GB\]\u@\h\[$RS\]:`
-    `\[$CB\]\$(shorten_path)\[$RS\]`
-    `\[$YE\] $(git_prompt)`
-    `\[$MA\]$(virtualenv_prompt)
-\[$WB\]╰─➤\[$RS\]  "
+    `\[$CB\]$(shorten_path)\[$RS\]`
+    `\[$YE\]$(__git_ps1 "(%s)")`
+    `\[$MA\]$(virtualenv_prompt)\n`
+    `\[$WB\]╰─➤\[$RS\]  "
