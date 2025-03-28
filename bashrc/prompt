@@ -1,0 +1,56 @@
+# This is a collection of functions to customize the bash prompt.
+# There are far more sophisticated capabilities, like the ohmy*sh series,
+# but sometimes I just need a simple prompt on a utility or dev server.
+
+# Useful for Python programmers
+virtualenv_prompt() {
+    # If not in a virtualenv, print nothing
+    [[ "$VIRTUAL_ENV" == "" ]] && return
+
+    # Distinguish between the shell where the virtualenv was activated
+    # and its children
+    local venv_name="${VIRTUAL_ENV##*/}"
+    if typeset -f deactivate >/dev/null; then
+        echo "[${venv_name}] "
+    else
+        echo "<${venv_name}> "
+    fi
+}
+
+# Useful when working with git
+git_prompt() {
+    # Check if git is installed
+    command -v git &>/dev/null || return
+
+    # If not in a git repo, print nothing
+    git rev-parse --is-inside-work-tree &>/dev/null || return
+
+    # Print the current branch name
+    local branch_name
+    branch_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    echo "(${branch_name}) "
+}
+
+# Shorten the path
+#   /home/user1/project/dir/subdir/.hidden/another => ~/p/d/s/.h/another
+shorten_path() {
+    pwd | sed -E -e "s:^${HOME}:~:" -e "s:([^/\.])[^/]+/:\1/:g"
+}
+
+# Disable the default virtualenv prompt decorator
+VIRTUAL_ENV_DISABLE_PROMPT=1
+
+# Set the prompt
+# This one is a two-line variant that I like
+# Note this depends on the colors function in this repo as well
+#
+#Since the prompt is long, I wrapped it using line continuation characters
+# NOTE: the second to last line has an embedded newline so does NOT use the
+#       line continuation character ` (backtick)
+PS1="${debian_chroot:+\[$RB\]($debian_chroot)}`
+    `\[$WB\]╭─`
+    `\[$GB\]\u@\h\[$RS\]:`
+    `\[$CB\]\$(shorten_path)\[$RS\]`
+    `\[$YE\] $(git_prompt)`
+    `\[$MA\]$(virtualenv_prompt)
+\[$WB\]╰─➤\[$RS\]  "

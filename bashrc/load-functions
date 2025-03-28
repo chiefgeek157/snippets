@@ -1,0 +1,16 @@
+# Load functions from well-known locations
+# I prefer .bash_funcs over .bash_functions
+
+# Load functions from the single file .bash_funcs
+if [ -f ~/.bash_funcs ]; then
+    . ~/.bash_funcs
+fi
+
+# Load functions from the directory .bash_funcs.d
+if [[ -d ~/.bash_funcs.d ]]; then
+    for file in ~/.bash_funcs.d/*; do
+        # NOTE: there are no sanity checks on the files in this directory
+        #       so be careful what you put in there
+        . $file
+    done
+fi

@@ -1,0 +1,81 @@
+#!/bin/false
+# This function must be loaded using "source" or "." command
+# This file contains color codes and functions for coloring text in bash
+# scripts. It defines various color codes and a function to colorize text.
+#
+# Use in "echo -e" statements of with the "log" function
+#
+# Example:
+#   echo -e "${RE}This is red text${RS}"
+#   echo -e "${GR}This is green text${RS}"
+#
+# To use in the shell prompt, PS1, you must use the following format:
+#   PS1="\[$RE\] some text here \[$RS\]"
+#   This example would print "some text here" in red, and reset the color
+#   after.
+# Note that the \[ and \] are required to prevent bash from miscalculating
+#   the length of the prompt string. This is important for line wrapping
+#   and cursor positioning. Those characters must be explicitly included
+#   in the prompt string rather that coming from the variable value.
+
+# Check if the script is being sourced
+if [ "'${BASH_SOURCE[0]}'" == "'$0'" ]; then
+    # Note: cannot use color variables yet because they are not loaded
+    echo -e "\e[31mERROR: This file must be sourced, not executed.\e[0m"
+    exit 1
+fi
+
+# Colors
+# Reset all attributes
+RC="\e[0m"   # Reset color
+RS="\e[0;0m" # Reset all attributes
+
+# Common colors
+BK="\e[30m"  # Black
+RE="\e[31m"  # Red
+GR="\e[32m"  # Green
+YE="\e[33m"  # Yellow
+BL="\e[34m"  # Blue
+MA="\e[35m"  # Magenta
+CY="\e[36m"  # Cyan
+WH="\e[97m"  # White
+
+# Extended colors
+LGY="\e[37m" # Light Gray
+DGY="\e[90m" # Dark Gray
+LRE="\e[91m" # Light Red
+LGR="\e[92m" # Light Green
+LYE="\e[93m" # Light Yellow
+LBL="\e[94m" # Light Blue
+LMA="\e[95m" # Light Magenta
+LCY="\e[96m" # Light Cyan
+
+# Attributes
+BO="\e[1m"   # Bold
+DI="\e[2m"   # Dim
+IT="\e[3m"   # Italic
+UL="\e[4m"   # Underline
+BN="\e[5m"   # Blink
+RV="\e[7m"   # Reverse
+HD="\e[8m"   # Hidden
+ST="\e[9m"   # Strikethrough
+
+# Attributes off: handy if you only want to turn off one attribute
+BOOFF="\e[22m" # Bold off
+DIOFF="\e[22m" # Dim off
+ITOFF="\e[23m" # Italic off
+ULOFF="\e[24m" # Underline off
+BNOFF="\e[25m" # Blink off
+RVOFF="\e[27m" # Reverse off
+HDOFF="\e[28m" # Hidden off
+STOFF="\e[29m" # Strikethrough off
+
+# Common combos
+# NOTE: combos can be created by combining codes with a ;
+RB="\e[31;1m"  # Red Bold
+GB="\e[32;1m"  # Green Bold
+YB="\e[33;1m"  # Yellow Bold
+BB="\e[34;1m"  # Blue Bold
+MB="\e[35;1m"  # Magenta Bold
+CB="\e[36;1m"  # Cyan Bold
+WB="\e[97;1m"  # White Bold
