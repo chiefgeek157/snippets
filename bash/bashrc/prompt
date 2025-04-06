@@ -9,7 +9,7 @@ virtualenv_prompt() {
 
     # Distinguish between the shell where the virtualenv was activated
     # and its children
-    local venv_name="${VIRTUAL_ENV##*/}"
+    local venv_name=$(shorten_path "$VIRTUAL_ENV")
     if typeset -f deactivate >/dev/null; then
         echo "[${venv_name}] "
     else
@@ -20,7 +20,11 @@ virtualenv_prompt() {
 # Shorten the path
 #   /home/user1/project/dir/subdir/.hidden/another => ~/p/d/s/.h/another
 shorten_path() {
-    pwd | sed -E -e "s:^${HOME}:~:" -e "s:([^/\.])[^/]+/:\1/:g"
+    local path="$1"
+    if [ -z "$path" ]; then
+        path=$(pwd)
+    fi
+    echo $path | sed -E -e "s:^${HOME}:~:" -e "s:([^/\.])[^/]+/:\1/:g"
 }
 
 # Set useful config for the builtin git prompt
@@ -44,7 +48,7 @@ VIRTUAL_ENV_DISABLE_PROMPT=1
 #       line continuation character ` (backtick)
 PS1="\[$WB\]╭─${debian_chroot:+\[$RB\]($debian_chroot)}`
     `\[$GB\]\u@\h\[$RS\]:`
-    `\[$CB\]$(shorten_path)\[$RS\]`
-    `\[$YE\]$(__git_ps1 "(%s)")`
-    `\[$MA\]$(virtualenv_prompt)\n`
+    `\[$CB\]\$(shorten_path)\[$RS\]`
+    `\[$YE\]\$(__git_ps1 '(%s)')`
+    `\[$MA\]\$(virtualenv_prompt)\n`
     `\[$WB\]╰─➤\[$RS\]  "
