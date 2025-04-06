@@ -1,10 +1,73 @@
+#!/bin/false
+
+if [ "'${BASH_SOURCE[0]}'" == "'$0'" ]; then
+    echo -e "\e[31mERROR: This file must be sourced, not executed.\e[0m"
+    exit 1
+fi
+
 aws-profile() {
+
+    local script_name="$BASH_SOURCE:$FUNCNAME"
+    local options=$(getopt \
+        -l "list,unset,help" \
+        -o "luh" \
+        --name "$script_name" -- "$@")
+    if [ $? -ne 0 ]; then
+        lerr "Internal problem: try adding --help for more information"
+        return 1
+    fi
+
+    eval set -- "$options"
+    while :; do
+        case "${1}" in
+        -l|--list)
+            log 0 "${YE}Available AWS profiles:"
+            echo -en "$CY"
+            aws configure list-profiles --no-cli-auto-prompt
+            echo -en "$RS"
+            shift
+            return 0
+            ;;
+        -u|--unset)
+            unset AWS_PROFILE
+            log 0 "${YE}Unset AWS profile"
+            shift
+            return 0
+            ;;
+        -h|--help)
+            log "Usage: $script_name [options] [profile]"
+            log 0 "  with no options, displays the current profile, or the"
+            log 0 "  list of available profiles if no profile is set (see"
+            log 0 "  --list)"
+            log 0 ""
+            log 0 "  profile: optional, the profile to set"
+            log 0 ""
+            log 0 "Options:"
+            log 0 "  -l|--list list available AWS profiles"
+            log 0 "  -u|--unset: Unset the current AWS profile"
+            log 0 "  -h|--help: Show this help message"
+            shift
+            return 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            log "ERROR: Internal error!"
+            return 1
+            ;;
+        esac
+    done
+
     if [ -z "$1" ]; then
         if [ -z "$AWS_PROFILE" ]; then
-            echo -e "${YE}No AWS profile set. Available profiles:${RS}"
-            aws configure list-profiles
+            log 0 "${YE}No AWS profile set. Available profiles:${CY}"
+            echo -en "$CY"
+            aws configure list-profiles --no-cli-auto-prompt
+            echo -en "$RS"
         else
-            echo -e "${YE}Current AWS profile: ${RS}$AWS_PROFILE"
+            log 0 "${YE}Current AWS profile: ${CY}$AWS_PROFILE"
         fi
         return 0
     fi
