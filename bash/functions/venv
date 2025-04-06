@@ -1,0 +1,21 @@
+!/bin/false
+# Functions to make venv more useful
+
+if [ "'${BASH_SOURCE[0]}'" == "'$0'" ]; then
+    echo -e "\e[31mERROR: This file must be sourced, not executed.\e[0m"
+    exit 1
+fi
+
+vactivate() {
+    local virt_dir="./.venv"
+    if [ -n "$1" ]; then
+        virt_dir="$1"
+    fi
+    if [ -d $virt_dir ]; then
+        log 0 "${GR}Activating: ${CY}$virt_dir"
+        . $virt_dir/bin/activate
+    else
+        log 0 "${RE}ERROR: venv directory found: ${CY}$virt_dir"
+        return 1
+    fi
+}
