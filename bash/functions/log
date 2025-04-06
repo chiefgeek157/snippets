@@ -1,0 +1,121 @@
+#!/bin/false
+
+if [ "'${BASH_SOURCE[0]}'" == "'$0'" ]; then
+    echo -e "\e[31mERROR: This file must be sourced, not executed.\e[0m"
+    exit 1
+fi
+
+# Logging versbosity levels
+VOFF=-1
+VERR=0
+VWRN=1
+VINF=2
+VDBG=3
+VTRA=4
+
+# Default logging verbosity level
+# Set to various integers to control output of log messages
+# -1: diable all logging
+if [ -z "$verbosity" ]; then
+    verbosity=$VWRN
+    verbosity_param=""
+fi
+
+# Log a message depending on the verbosity level
+# Automatically adds the ENDCOLOR code to the message
+#
+# Parameters:
+#   $1: verbosity level or message
+#   $2: message
+#
+# This allows for the following usage:
+#   log "This is a message"
+#     Output regardless of verbosity level
+#   log 1 "This is a message"
+#     Output if verbosity level is 1 or higher
+#
+# CONVENTIONS
+#    0: Always logged (default), use RED for errors
+#    1: Warnings, use YELLOW
+#    2: Info, use GREEN with CYAN for highlight
+#    3: Debug: use MAGENTA with CYAN for highlight
+#    4: Trace: use BLUE with CYAN for highlight
+log() {
+    local level=$1
+    local msg=$2
+    if [ $# -eq 0 ]; then
+        # Nothing to do
+        return 0
+    fi
+    if [ $# -eq 1 ]; then
+        level=$VWRN
+        msg=$1
+    fi
+    if [ $verbosity -ge $level ]; then
+        echo -e "$msg${RS}" >&2
+    fi
+}
+
+lerr() {
+    log $VERR "${RE}ERROR: $1"
+}
+
+lwrn() {
+    log $VWRN "${YE}WARNING: $1"
+}
+
+linf() {
+    log $VINF "${GR}INFO: $1"
+}
+
+ldbg() {
+    log $VDBG "${MA}DEBUG: $1"
+}
+
+ltra() {
+    log $VTRA "${BL}TRACE: $1"
+}
+
+declare -A vlevels
+vlevels[$VOFF]="OFF"
+vlevels[$VERR]="ERROR"
+vlevels[$VWRN]="WARNING"
+vlevels[$VINF]="INFO"
+vlevels[$VDBG]="DEBUG"
+vlevels[$VTRA]="TRACE"
+
+vlevel() {
+    if [[ -v vlevels[$verbosity] ]]; then
+        echo "${vlevels[$verbosity]}"
+    else
+        echo "UNKNOWN"
+    fi
+}
+
+raise_vlevel() {
+    if [ $verbosity -lt $VTRA ]; then
+        verbosity=$((verbosity + 1))
+    fi
+}
+
+lower_vlevel() {
+    if [ $verbosity -gt $VERR ]; then
+        verbosity=$((verbosity - 1))
+    fi
+}
+
+# Turn the verbosity var into a command line parameter that can be passed
+# to other scripts or functions
+# Globals:
+#   verbosity
+#   verbosity_param
+set_verbosity_param() {
+    log 3 "${BL}ENTERING $BASH_SOURCE:$FUNCNAME()"
+    verbosity_param=""
+    if [ $verbosity -gt 0 ]; then
+        printf -v verbosity_param '%.sv' $(seq $verbosity)
+        verbosity_param="-$verbosity_param"
+    fi
+    log 1 "${MA}Verbosity parameter: ${CY}$verbosity_param"
+    log 3 "${BL}LEAVING $BASH_SOURCE:$FUNCNAME()"
+}

@@ -1,0 +1,13 @@
+aws-profile() {
+    if [ -z "$1" ]; then
+        if [ -z "$AWS_PROFILE" ]; then
+            echo -e "${YE}No AWS profile set. Available profiles:${RS}"
+            aws configure list-profiles
+        else
+            echo -e "${YE}Current AWS profile: ${RS}$AWS_PROFILE"
+        fi
+        return 0
+    fi
+
+    export AWS_PROFILE="$1"
+}
