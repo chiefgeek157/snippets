@@ -39,6 +39,7 @@ BL="\e[34m"  # Blue
 MA="\e[35m"  # Magenta
 CY="\e[36m"  # Cyan
 WH="\e[97m"  # White
+OR="\e[38;5;208m" # Orange
 
 # Extended colors
 LGY="\e[37m" # Light Gray
@@ -79,3 +80,4 @@ BB="\e[34;1m"  # Blue Bold
 MB="\e[35;1m"  # Magenta Bold
 CB="\e[36;1m"  # Cyan Bold
 WB="\e[97;1m"  # White Bold
+OB="\e[38;5;208;1m" # Orange Bold
