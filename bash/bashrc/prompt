@@ -17,6 +17,15 @@ virtualenv_prompt() {
     fi
 }
 
+# Useful for AWS CLI
+aws_prompt() {
+    if [[ "$AWS_PROFILE" == "" ]]; then
+        echo "[aws:none] "
+    else
+        echo "[aws:$AWS_PROFILE] "
+    fi
+}
+
 # Shorten the path
 #   /home/user1/project/dir/subdir/.hidden/another => ~/p/d/s/.h/another
 shorten_path() {
@@ -50,5 +59,6 @@ PS1="\[$WB\]╭─${debian_chroot:+\[$RB\]($debian_chroot)}`
     `\[$GB\]\u@\h\[$RS\]:`
     `\[$CB\]\$(shorten_path)\[$RS\]`
     `\[$YE\]\$(__git_ps1 '(%s)')`
-    `\[$MA\]\$(virtualenv_prompt)\n`
+    `\[$MA\]\$(virtualenv_prompt)`
+    `\[$OR\]\$(aws_prompt)\n`
     `\[$WB\]╰─➤\[$RS\]  "
